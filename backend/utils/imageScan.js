@@ -9,11 +9,12 @@ class ImageScanner {
     try {
       // 遍历配置中的所有分类
       for (const category of config.categories) {
-        const categoryPath = category.path;
+        const categoryPath = path.resolve(__dirname, '../../', category.path);
         const categoryTag = category.tag;
         
         // 确保目录存在
         await fs.mkdir(categoryPath, { recursive: true });
+        console.log(`扫描目录: ${categoryPath}`);
         
         // 读取目录下的所有文件
         const files = await fs.readdir(categoryPath);
@@ -26,7 +27,7 @@ class ImageScanner {
 
         // 检查每个图片是否已在数据库中
         for (const filename of imageFiles) {
-          const imagePath = `/${category.path}/${filename}`;
+          const imagePath = `/${path.relative(path.resolve(__dirname, '../../'), path.join(categoryPath, filename)).replace(/\\/g, '/')}`;
           
           // 检查数据库中是否已存在
           const exists = await Image.findByPath(imagePath);
@@ -49,21 +50,21 @@ class ImageScanner {
   }
 
   static watchDirectories() {
-    const watcher = chokidar.watch(config.categories.map(c => c.path), {
+    const watchPaths = config.categories.map(c => path.resolve(__dirname, '../../', c.path));
+    const watcher = chokidar.watch(watchPaths, {
       ignored: /(^|[\/\\])\../, // 忽略隐藏文件
       persistent: true
     });
 
     watcher.on('add', async filepath => {
+      console.log(`检测到新文件: ${filepath}`);
       const ext = path.extname(filepath).toLowerCase();
       if (['.jpg', '.jpeg', '.png', '.gif'].includes(ext)) {
         const filename = path.basename(filepath);
-        const category = config.categories.find(c => 
-          filepath.includes(c.path)
-        );
+        const category = config.categories.find(c => filepath.includes(path.resolve(__dirname, '../../', c.path)));
         
         if (category) {
-          const imagePath = `/${path.relative('uploads', filepath).replace(/\\/g, '/')}`;
+          const imagePath = `/${path.relative(path.resolve(__dirname, '../../', 'uploads'), filepath).replace(/\\/g, '/')}`;
           
           try {
             const exists = await Image.findByPath(imagePath);
@@ -75,12 +76,20 @@ class ImageScanner {
                 likes: 0
               });
               console.log(`新图片已添加: ${filename}`);
+            } else {
+              console.log(`图片已存在: ${filename}`);
             }
           } catch (error) {
             console.error(`添加图片失败 ${filename}:`, error);
           }
+        } else {
+          console.warn(`未找到匹配的分类 для文件: ${filename}`);
         }
       }
+    });
+
+    watcher.on('error', error => {
+      console.error('Watcher 错误:', error);
     });
 
     console.log('开始监控图片目录变化');

@@ -31,11 +31,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: '服务器内部错误' });
 });
 
+// 启动服务器并初始化图片扫描与监控
 const PORT = config.server.port || 3000;
 app.listen(PORT, async () => {
   console.log(`服务器运行在 http://${config.server.host}:${PORT}`);
-  
-  // 启动时扫描图片并开始监控
-  await ImageScanner.scanAndImport();
-  ImageScanner.watchDirectories();
+  try {
+    await ImageScanner.scanAndImport();
+    ImageScanner.watchDirectories();
+  } catch (error) {
+    console.error('初始化 ImageScanner 失败:', error);
+  }
 });
