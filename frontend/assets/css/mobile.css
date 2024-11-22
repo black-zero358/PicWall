@@ -1,0 +1,106 @@
+@media screen and (max-width: 768px) {
+    /* 导航栏适配 */
+    header {
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    nav {
+        flex-direction: column;
+        padding: 0.5rem;
+    }
+
+    .categories {
+        margin: 10px 0;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding: 5px 0;
+    }
+
+    .categories button {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+    /* 瀑布流布局适配 */
+    .grid-item {
+        width: calc(33.333% - 10px);
+        margin: 5px;
+    }
+
+    /* 弹窗适配 */
+    .modal-content {
+        max-width: 95%;
+        margin: 20px auto;
+        padding: 10px;
+    }
+
+    .interact-panel {
+        padding: 10px;
+    }
+
+    /* 评论区适配 */
+    .comment-input textarea {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    #commentText {
+        height: 60px;
+    }
+
+    .comments {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    /* 按钮和输入框适配 */
+    button, select {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+    #sortSelect {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
+
+/* 超小屏幕适配 */
+@media screen and (max-width: 480px) {
+    .masonry-grid {
+        margin-top: 150px; /* 增加顶部空间 */
+    }
+
+    .grid-item {
+        width: calc(50% - 8px); /* 确保两列布局 */
+    }
+
+    .modal-content {
+        padding: 5px;
+    }
+
+    nav {
+        padding: 0.3rem;
+    }
+
+    .logo {
+        font-size: 16px;
+    }
+
+    .categories {
+        margin: 8px 0;
+    }
+
+    .categories button {
+        padding: 4px 10px;
+        font-size: 13px;
+    }
+
+    #sortSelect {
+        width: 100%;
+        margin: 5px 0;
+        font-size: 13px;
+    }
+}

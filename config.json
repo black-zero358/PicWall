@@ -1,0 +1,26 @@
+{
+  "server": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "database": {
+    "path": "./database/images.db"
+  },
+  "gallery": {
+    "columns": {
+      "desktop": 4,
+      "mobile": 3
+    },
+    "preloadCount": 20
+  },
+  "categories": [
+    {
+      "path": "uploads/category1",
+      "tag": "风景"
+    },
+    {
+      "path": "uploads/category2",
+      "tag": "人物"
+    }
+  ]
+}

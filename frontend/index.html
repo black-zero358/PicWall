@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片墙</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/grid.css">
+    <link rel="stylesheet" href="assets/css/mobile.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">图片墙</div>
+            <div class="categories">
+                <button class="active" data-category="all">全部</button>
+                <button data-category="风景">风景</button>
+                <button data-category="人物">人物</button>
+            </div>
+            <div class="sort">
+                <select id="sortSelect">
+                    <option value="time">时间排序</option>
+                    <option value="likes">热度排序</option>
+                </select>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div id="gallery" class="masonry-grid"></div>
+        <div id="loading">加载中...</div>
+    </main>
+
+    <div id="imageModal" class="modal">
+        <button class="back-button" onclick="document.getElementById('imageModal').style.display='none'">返回</button>
+        <span class="close">&times;</span>
+        <div class="modal-content">
+            <div class="img-container">
+                <img id="modalImg" src="" alt="">
+            </div>
+            <div class="interact-panel">
+                <button id="likeBtn"><span id="likeCount">0</span> 喜欢</button>
+                <div class="comments">
+                    <div id="commentsList"></div>
+                    <div class="comment-input">
+                        <textarea id="commentText" maxlength="500" placeholder="添加评论..."></textarea>
+                        <button id="submitComment">发送</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+    <script src="assets/js/interact.js"></script>
+    <script src="assets/js/masonry.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/sort.js"></script>
+    <script>
+        console.log('初始化检查:', {
+            likeUtils: window.likeUtils ? '已加载' : '未加载',
+            handleLike: window.handleLike ? '已加载' : '未加载',
+            loadComments: window.loadComments ? '已加载' : '未加载'
+        });
+    </script>
+    <script>
+        // 添加全局错误处理
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error('全局错误:', { msg, url, lineNo, columnNo, error });
+            return false;
+        };
+        
+        // 添加未捕获的Promise错误处理
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('未处理的Promise错误:', event.reason);
+        });
+    </script>
+</body>
+</html>

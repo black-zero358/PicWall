@@ -1,0 +1,64 @@
+.masonry-grid {
+    /* 增加顶部边距以避免被导航栏遮挡 */
+    margin: 120px auto 20px; /* 从80px改为120px */
+    max-width: 1200px;
+    padding: 0 15px;
+}
+
+.grid-item {
+    width: calc(25% - 10px);
+    margin-bottom: 10px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.grid-item:hover {
+    transform: translateY(-5px);
+}
+
+.grid-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.grid-item-info {
+    padding: 10px;
+}
+
+.image-info {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.category {
+    color: var(--primary-color);
+}
+
+.likes {
+    color: #ff4444;
+}
+
+@media screen and (max-width: 768px) {
+    .grid-item {
+        width: calc(33.333% - 10px);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .masonry-grid {
+        padding: 0 10px;
+    }
+    
+    .grid-item {
+        width: calc(50% - 8px); /* 调整间距 */
+        margin: 4px;  /* 减小间距 */
+    }
+}
