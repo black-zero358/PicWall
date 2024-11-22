@@ -16,11 +16,11 @@
   "categories": [
     {
       "path": "uploads/category1",
-      "tag": "风景"
+      "tag": "tag1"
     },
     {
       "path": "uploads/category2",
-      "tag": "人物"
+      "tag": "tag2"
     }
   ]
 }
