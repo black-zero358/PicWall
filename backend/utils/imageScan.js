@@ -27,7 +27,8 @@ class ImageScanner {
 
         // 检查每个图片是否已在数据库中
         for (const filename of imageFiles) {
-          const imagePath = `/${path.relative(path.resolve(__dirname, '../../'), path.join(categoryPath, filename)).replace(/\\/g, '/')}`;
+          // 修改为使用uploads前缀的路径
+          const imagePath = `/uploads/${path.relative(path.resolve(__dirname, '../../uploads'), path.join(categoryPath, filename)).replace(/\\/g, '/')}`;
           
           // 检查数据库中是否已存在
           const exists = await Image.findByPath(imagePath);
@@ -64,7 +65,8 @@ class ImageScanner {
         const category = config.categories.find(c => filepath.includes(path.resolve(__dirname, '../../', c.path)));
         
         if (category) {
-          const imagePath = `/${path.relative(path.resolve(__dirname, '../../', 'uploads'), filepath).replace(/\\/g, '/')}`;
+          // 修改为使用uploads前缀的路径
+          const imagePath = `/uploads/${path.relative(path.resolve(__dirname, '../../uploads'), filepath).replace(/\\/g, '/')}`;
           
           try {
             const exists = await Image.findByPath(imagePath);
@@ -72,7 +74,7 @@ class ImageScanner {
               await Image.create({
                 filename,
                 category: category.tag,
-                path: imagePath,
+                path: imagePath,  // 保存正确的相对路径到数据库
                 likes: 0
               });
               console.log(`新图片已添加: ${filename}`);
@@ -82,8 +84,6 @@ class ImageScanner {
           } catch (error) {
             console.error(`添加图片失败 ${filename}:`, error);
           }
-        } else {
-          console.warn(`未找到匹配的分类 для文件: ${filename}`);
         }
       }
     });

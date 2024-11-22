@@ -14,7 +14,8 @@ app.use(express.json());
 
 // 静态文件服务
 app.use(express.static(path.join(__dirname, '../frontend'))); // 前端页面
-app.use('/uploads', express.static('uploads')); // 图片文件
+// 确保uploads目录映射正确
+app.use('/uploads', express.static(path.join(__dirname, '../uploads'))); // 图片文件
 
 // API路由
 app.use('/api/images', imageRoutes);

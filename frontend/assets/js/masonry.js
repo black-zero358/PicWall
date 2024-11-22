@@ -25,19 +25,23 @@ function createImageElement(image) {
     item.className = 'grid-item';
     
     const img = document.createElement('img');
-    // 确保图片路径正确
+    // 使用数据库中存储的完整路径，无需额外处理
     img.src = image.path;
     img.alt = image.filename;
     
-    // 添加加载完成事件
-    img.onload = () => {
+    // 增强错误处理的日志信息
+    img.onerror = () => {
+        console.error('图片加载失败:', {
+            originalPath: image.path,
+            processedPath: img.src,
+            imageData: image,
+            baseUrl: window.location.origin
+        });
+        item.remove();
         masonry.layout();
     };
-
-    // 添加失败处理
-    img.onerror = () => {
-        console.error('图片加载失败:', image.path);
-        item.remove();
+    
+    img.onload = () => {
         masonry.layout();
     };
 
@@ -49,12 +53,13 @@ function createImageElement(image) {
         const likeCount = document.getElementById('likeCount');
         const likeBtn = document.getElementById('likeBtn');
         
+        // 模态框图片路径也使用相同的处理逻辑
         modalImg.src = image.path;
         likeCount.textContent = image.likes;
         currentImageId = image.id; // 设置当前图片ID用于评论功能
         modal.style.display = 'block';
 
-        // 检查��赞功能
+        // 检查点赞功能
         if (typeof window.likeUtils !== 'object' || typeof window.handleLike !== 'function') {
             console.error('点赞功能未正确初始化:', {
                 likeUtils: typeof window.likeUtils,
