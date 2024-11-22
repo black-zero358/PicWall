@@ -5,6 +5,7 @@ const config = require('../config.json');
 const imageRoutes = require('./routes/images');
 const commentRoutes = require('./routes/comments');
 const ImageScanner = require('./utils/imageScan');
+const SymlinkManager = require('./utils/symlink');
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads'))); // 图�
 app.use('/api/images', imageRoutes);
 app.use('/api/comments', commentRoutes);
 
-// 所有其他GET请求返回index.html
+// 所有��他GET请求返回index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
@@ -32,14 +33,19 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: '服务器内部错误' });
 });
 
-// 启动服务器并初始化图片扫描与监控
-const PORT = config.server.port || 3000;
-app.listen(PORT, async () => {
-  console.log(`服务器运行在 http://${config.server.host}:${PORT}`);
-  try {
+// 初始化函数
+async function initialize() {
+    // 创建符号链接
+    await SymlinkManager.createSymlinks();
+    // 扫描���导入图片
     await ImageScanner.scanAndImport();
+    // 开始监控图片变化
     ImageScanner.watchDirectories();
-  } catch (error) {
-    console.error('初始化 ImageScanner 失败:', error);
-  }
+}
+
+const PORT = config.server.port || 3000;
+// 启动服务器并初始化
+app.listen(PORT, async () => {
+    console.log(`服务器运行在 http://${config.server.host}:${PORT}`);
+    await initialize();
 });

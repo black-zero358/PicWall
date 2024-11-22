@@ -2,7 +2,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const Image = require('../models/Image');
 const config = require('../../config.json');
-const chokidar = require('chokidar'); // 改用 chokidar
+const chokidar = require('chokidar');
 
 class ImageScanner {
   static async scanAndImport() {
@@ -27,13 +27,12 @@ class ImageScanner {
 
         // 检查每个图片是否已在数据库中
         for (const filename of imageFiles) {
-          // 修改为使用uploads前缀的路径
-          const imagePath = `/uploads/${path.relative(path.resolve(__dirname, '../../uploads'), path.join(categoryPath, filename)).replace(/\\/g, '/')}`;
+          // 使用分类标签构建相对路径
+          const imagePath = `/uploads/${categoryTag}/${filename}`;
           
           // 检查数据库中是否已存在
           const exists = await Image.findByPath(imagePath);
           if (!exists) {
-            // 添加到数据库
             await Image.create({
               filename,
               category: categoryTag,
@@ -65,8 +64,8 @@ class ImageScanner {
         const category = config.categories.find(c => filepath.includes(path.resolve(__dirname, '../../', c.path)));
         
         if (category) {
-          // 修改为使用uploads前缀的路径
-          const imagePath = `/uploads/${path.relative(path.resolve(__dirname, '../../uploads'), filepath).replace(/\\/g, '/')}`;
+          // 使用分类标签构建相对路径
+          const imagePath = `/uploads/${category.tag}/${filename}`;
           
           try {
             const exists = await Image.findByPath(imagePath);
@@ -74,7 +73,7 @@ class ImageScanner {
               await Image.create({
                 filename,
                 category: category.tag,
-                path: imagePath,  // 保存正确的相对路径到数据库
+                path: imagePath,
                 likes: 0
               });
               console.log(`新图片已添加: ${filename}`);
