@@ -4,20 +4,42 @@ let page = 1;
 
 function initMasonry() {
     const grid = document.querySelector('.masonry-grid');
+    const isMobile = window.innerWidth <= 768;
+    
     masonry = new Masonry(grid, {
         itemSelector: '.grid-item',
         columnWidth: '.grid-item',
-        gutter: window.innerWidth <= 480 ? 8 : 10, // 移动端使用更小的间距
+        gutter: isMobile ? 8 : 10,
         percentPosition: true,
-        transitionDuration: 0 // 提高移动端性能
+        transitionDuration: 0,
+        fitWidth: true
     });
 }
 
-// 添加窗口大小改变时重新布局的处理
+// 优化resize事件处理
+let resizeTimer;
 window.addEventListener('resize', () => {
-    if (masonry) {
-        masonry.layout();
-    }
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (masonry) {
+            // 重新计算所有图片的高度约束
+            const screenHeight = window.innerHeight;
+            const maxHeight = Math.floor(screenHeight * 0.6);
+            const minHeight = Math.floor(screenHeight * 0.2);
+            
+            document.querySelectorAll('.grid-item img').forEach(img => {
+                img.style.maxHeight = `${maxHeight}px`;
+                img.style.minHeight = `${minHeight}px`;
+                // 检查实际高度是否小于最小高度
+                if (img.naturalHeight < minHeight) {
+                    img.style.minHeight = 'auto';
+                }
+            });
+            
+            masonry.destroy();
+            initMasonry();
+        }
+    }, 250);
 });
 
 function createImageElement(image) {
@@ -25,9 +47,18 @@ function createImageElement(image) {
     item.className = 'grid-item';
     
     const img = document.createElement('img');
-    // 使用数据库中存储的完整路径，无需额外处理
     img.src = image.path;
     img.alt = image.filename;
+    
+    // 计算合适的图片高度
+    const screenHeight = window.innerHeight;
+    const maxHeight = Math.floor(screenHeight * 0.6); // 图片最大高度为屏幕高度的60%
+    const minHeight = Math.floor(screenHeight * 0.2); // 最小高度为屏幕高度的20%
+    
+    // 设置图片的最大和最小高度约束
+    img.style.maxHeight = `${maxHeight}px`;
+    img.style.minHeight = `${minHeight}px`;
+    img.style.objectFit = 'cover'; // 确保图片填充满容器
     
     // 增强错误处理的日志信息
     img.onerror = () => {
@@ -42,6 +73,10 @@ function createImageElement(image) {
     };
     
     img.onload = () => {
+        // 图片加载完成后，如果实际高度小于最小高度，则移除最小高度限制
+        if (img.naturalHeight < minHeight) {
+            img.style.minHeight = 'auto';
+        }
         masonry.layout();
     };
 

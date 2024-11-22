@@ -9,7 +9,7 @@
   "gallery": {
     "columns": {
       "desktop": 4,
-      "mobile": 3
+      "mobile": 2
     },
     "preloadCount": 20
   },

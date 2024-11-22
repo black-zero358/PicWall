@@ -1,12 +1,12 @@
 .masonry-grid {
     /* 增加顶部边距以避免被导航栏遮挡 */
     margin: 120px auto 20px; /* 从80px改为120px */
-    max-width: 1200px;
+    max-width: 1400px; /* 增加最大宽度以适应5列布局 */
     padding: 0 15px;
 }
 
 .grid-item {
-    width: calc(25% - 10px);
+    width: calc(20% - 10px); /* 默认5列布局 (100% / 5) */
     margin-bottom: 10px;
     background: white;
     border-radius: 8px;
@@ -22,8 +22,9 @@
 
 .grid-item img {
     width: 100%;
-    height: auto;
     display: block;
+    object-fit: cover; /* 确保图片填充满容器 */
+    transition: transform 0.3s ease; /* 添加平滑过渡效果 */
 }
 
 .grid-item-info {
@@ -46,19 +47,30 @@
     color: #ff4444;
 }
 
-@media screen and (max-width: 768px) {
+/* 平板端适配 - 3列布局 */
+@media screen and (max-width: 1024px) {
     .grid-item {
         width: calc(33.333% - 10px);
+        margin: 5px;
     }
 }
 
-@media screen and (max-width: 480px) {
+/* 移动端适配 - 2列布局 */
+@media screen and (max-width: 768px) {
     .masonry-grid {
         padding: 0 10px;
     }
-    
+
     .grid-item {
-        width: calc(50% - 8px); /* 调整间距 */
-        margin: 4px;  /* 减小间距 */
+        width: calc(50% - 8px);
+        margin: 4px;
+    }
+}
+
+/* 确保小屏幕也保持2列布局 */
+@media screen and (max-width: 480px) {
+    .grid-item {
+        width: calc(50% - 8px);
+        margin: 4px;
     }
 }
