@@ -1,8 +1,33 @@
 # PicWall - 现代化图片展示网站
 
-一个基于Express和SQLite的轻量级图片展示网站，特色是响应式瀑布流布局、实时交互和优雅的UI设计。
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)
 
-## 核心特性
+> 一个基于Express和SQLite的轻量级图片展示网站，特色是响应式瀑布流布局、实时交互和优雅的UI设计。
+
+## 📑 目录
+
+- [环境要求](#-环境要求)
+- [核心特性](#-核心特性)
+- [快速开始](#-快速开始)
+- [项目配置](#-项目配置)
+- [API文档](#-api文档)
+- [技术实现](#-技术实现)
+- [开发指南](#-开发指南)
+- [性能优化](#-性能优化)
+- [错误处理](#-错误处理)
+- [目录结构](#-目录结构)
+- [贡献指南](#-贡献指南)
+
+## 🔧 环境要求
+
+- Node.js >= 14.0.0
+- NPM >= 6.0.0
+- SQLite3
+- 现代浏览器支持 (Chrome/Firefox/Safari/Edge)
+
+## ✨ 核心特性
 
 ### 图片展示
 - 基于原生JavaScript的自适应瀑布流布局
@@ -29,104 +54,54 @@
 - 自定义滚动条美化
 - 图片悬停动画效果
 
-## 技术栈
+## 🚀 快速开始
 
-### 前端
+### 1. 环境准备
+```bash
+# 检查Node.js版本
+node --version  # 应 >= 14.0.0
 
-- 原生JavaScript (ES6+)
-- CSS3 (包含响应式设计)
-- Masonry.js (瀑布流布局)
-- HTML5
-
-### 后端
-
-- Node.js
-- Express.js (RESTful API)
-- SQLite3 (数据库)
-- Chokidar (文件监控)
-- Multer (文件上传)
-- Express-validator (数据验证)
-- CORS (跨域资源共享)
-
-## 安装与使用
-
-1. **克隆项目**
-
-   ```bash
-   git clone [项目地址]
-   ```
-
-2. **安装依赖**
-
-   ```bash
-   npm install
-   ```
-
-3. **配置项目**
-
-   - 复制 `config.example.json` 为 `config.json`
-   - 根据需要修改配置
-
-4. **创建必要目录**
-
-   ```bash
-   mkdir uploads database
-   ```
-
-5. **启动服务**
-
-   ```bash
-   npm start    # 生产环境
-   npm run dev  # 开发环境 (支持热重载)
-   ```
-
-## API接口
-
-### 图片相关
-
-```
-GET    /api/images                     # 获取所有图片
-GET    /api/images?page=1&category=all&sort=time  # 获取分类图片，支持分页和排序
-POST   /api/images/upload              # 上传图片
-PUT    /api/images/:id/like            # 点赞图片
-GET    /api/images/:id                  # 获取单个图片信息
+# 检查npm版本
+npm --version   # 应 >= 6.0.0
 ```
 
-### 评论相关
+### 2. 安装部署
 
-```
-GET    /api/comments/:imageId          # 获取指定图片的所有评论
-POST   /api/comments                   # 添加新评论
-```
+```bash
+# 克隆项目
+git clone [项目地址]
+cd pic-wall
 
-## 数据库设计
+# 安装依赖
+npm install
 
-### images表
+# 如果在中国大陆，建议使用npm镜像
+npm install --registry=https://registry.npmmirror.com
 
-```sql
-CREATE TABLE images (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    filename TEXT NOT NULL,
-    category TEXT NOT NULL,
-    likes INTEGER DEFAULT 0,
-    path TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-```
+# 复制配置文件
+cp config.example.json config.json
 
-### comments表
+# 创建必要目录
+mkdir -p uploads/{风景,人物} database
+chmod 755 uploads database
 
-```sql
-CREATE TABLE comments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    image_id INTEGER NOT NULL,
-    content TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (image_id) REFERENCES images (id)
-);
+# 初始化数据库
+node backend/utils/initDb.js
 ```
 
-## 配置说明
+### 3. 启动服务
+
+```bash
+# 开发环境（支持热重载）
+npm run dev
+
+# 生产环境
+npm start
+```
+
+## ⚙️ 项目配置
+
+### 配置文件说明
 
 在 `config.json` 中可配置：
 
@@ -161,67 +136,240 @@ CREATE TABLE comments (
 }
 ```
 
-## 技术实现
+## 📖 API文档
 
-### 前端
+### 图片管理接口
 
-- **瀑布流布局**
-  - 支持自适应列数
-  - 图片预加载和懒加载
-  - 无限滚动加载 (滚动距离1000px触发)
+```http
+# 获取图片列表
+GET /api/images
+Query参数:
+  - page: 页码 (默认: 1)
+  - limit: 每页数量 (默认: 20)
+  - category: 分类 (all/风景/人物)
+  - sort: 排序方式 (time/likes)
 
-- **分类与排序**
-  - 分类: 全部/风景/人物
-  - 排序: 时间(created_at DESC)/热度(likes DESC)
-  - 状态管理: 当前分类和排序记录
+响应示例:
+{
+  "status": "success",
+  "data": {
+    "images": [...],
+    "total": 100,
+    "page": 1,
+    "totalPages": 5
+  }
+}
 
-- **交互优化**
-  - 图片hover效果 (transform: translateY(-5px))
-  - 点赞按钮状态管理
-  - 模态框过渡动画
+# 上传图片
+POST /api/images/upload
+Content-Type: multipart/form-data
+Body:
+  - image: 图片文件
+  - category: 分类名称
 
-### 后端
+# 获取图片详情
+GET /api/images/:id
+响应示例:
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "filename": "example.jpg",
+    "category": "风景",
+    "likes": 10,
+    "path": "/uploads/风景/example.jpg",
+    "created_at": "2024-02-12T04:29:00.000Z"
+  }
+}
+```
 
-- **图片管理**
+### 评论管理接口
 
-  使用Chokidar监控上传目录，实时扫描并导入新图片到数据库。
+```http
+# 获取评论列表
+GET /api/comments/:imageId
+Query参数:
+  - page: 页码 (默认: 1)
+  - limit: 每页数量 (默认: 20)
 
-- **API接口**
+# 添加评论
+POST /api/comments
+Content-Type: application/json
+Body:
+{
+  "image_id": 1,
+  "content": "真是一张好照片！"
+}
+```
 
-  提供RESTful API接口，支持图片的获取、上传、点赞，以及评论的获取与添加。
+## 💻 技术实现
 
-- **数据验证与安全**
+### 技术栈概览
 
-  使用express-validator对API请求进行数据验证，确保数据的有效性和安全性。
+#### 前端技术
+- 原生JavaScript (ES6+)
+- CSS3 (包含响应式设计)
+- Masonry.js (瀑布流布局)
+- HTML5
 
-- **错误处理**
+#### 后端技术
+- Node.js
+- Express.js (RESTful API)
+- SQLite3 (数据库)
+- Chokidar (文件监控)
+- Multer (文件上传)
+- Express-validator (数据验证)
+- CORS (跨域资源共享)
 
-  全局错误处理中间件处理服务器内部错误，前端提供全局错误和未捕获Promise错误处理。
+### 数据库设计
 
-## 目录说明
-- `/uploads`: 图片存储目录，按分类存放
-- `/database`: SQLite数据库文件
-- `/frontend/assets`: 前端资源文件
-  - `/css`: 样式文件 (main.css/grid.css/mobile.css)
-  - `/js`: 脚本文件 (masonry.js/main.js/sort.js)
+#### images表
 
-## 性能优化
+```sql
+CREATE TABLE images (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename TEXT NOT NULL,
+    category TEXT NOT NULL,
+    likes INTEGER DEFAULT 0,
+    path TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
 
-### 前端优化
+#### comments表
+
+```sql
+CREATE TABLE comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    image_id INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (image_id) REFERENCES images (id)
+);
+```
+
+## 📝 开发指南
+
+### 新功能开发流程
+
+1. **添加新的API端点**
+   - 在 `backend/routes` 中创建路由文件
+   - 在 `backend/controllers` 中实现控制器逻辑
+   - 在 `backend/models` 中添加数据模型（如需要）
+   - 在 `server.js` 中注册路由
+
+2. **实现前端功能**
+   - 在 `frontend/assets/js` 中添加相关JS文件
+   - 在 `frontend/assets/css` 中添加样式
+   - 在 `index.html` 中引入新文件
+
+3. **添加新的数据表**
+   ```sql
+   -- 在 backend/config/db.js 中添加
+   CREATE TABLE IF NOT EXISTS new_table (
+       id INTEGER PRIMARY KEY AUTOINCREMENT,
+       field1 TEXT NOT NULL,
+       field2 INTEGER DEFAULT 0,
+       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+   );
+   ```
+
+### 代码规范
+
+- 使用ESLint进行代码检查
+- 遵循RESTful API设计规范
+- 使用语义化的HTML标签
+- CSS类名使用BEM命名规范
+- 保持代码注释的完整性
+
+## �� 性能优化
+
+### 前端性能优化
 
 - 图片懒加载减少初始加载时间
 - 事件节流控制滚动请求
 - CSS硬件加速提升动画性能
 - 分页加载控制内存占用
 
-### 后端优化
+### 后端性能优化
 
 - 图片压缩和格式验证
 - SQLite索引优化
 - 请求数据验证
 - 错误处理中间件
 
-## 主题定制
+## ⚠️ 错误处理
+
+### 前端错误处理
+
+```javascript
+// 全局错误处理
+window.onerror = function(message, source, lineno, colno, error) {
+    console.error('Global error:', error);
+    showErrorMessage('发生了一个错误，请刷新页面重试');
+};
+
+// Promise错误处理
+window.addEventListener('unhandledrejection', function(event) {
+    console.error('Unhandled promise rejection:', event.reason);
+    showErrorMessage('网络请求失败，请检查网络连接');
+});
+
+// API错误处理
+async function handleApiError(response) {
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || '请求失败');
+    }
+    return response.json();
+}
+```
+
+### 后端错误处理
+
+```javascript
+// 全局错误处理中间件
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(err.status || 500).json({
+        status: 'error',
+        message: err.message || '服务器内部错误'
+    });
+});
+
+// 404处理
+app.use((req, res) => {
+    res.status(404).json({
+        status: 'error',
+        message: '请求的资源不存在'
+    });
+});
+```
+
+## 📁 目录结构
+
+```
+pic-wall/
+├── 📂 backend/          # 后端代码
+│   ├── config/         # 配置文件
+│   ├── controllers/    # 控制器
+│   ├── models/         # 数据模型
+│   ├── routes/         # 路由定义
+│   ├── utils/          # 工具函数
+│   └── server.js       # 服务入口
+├── 📂 frontend/         # 前端代码
+│   ├── assets/         # 静态资源
+│   │   ├── css/       # 样式文件
+│   │   └── js/        # 脚本文件
+│   └── index.html     # 主页面
+├── 📂 uploads/          # 图片上传目录
+├── 📂 database/         # 数据库文件
+├── config.json         # 配置文件
+├── package.json        # 项目依赖
+└── readme.md          # 项目文档
+```
+
+## 🎨 主题定制
 
 ### CSS变量配置
 
@@ -237,83 +385,36 @@ CREATE TABLE comments (
 }
 ```
 
-## 目录结构
+## ⚡ 注意事项
 
-```
-pic-wall/
-├── backend/
-│   ├── config/
-│   │   └── db.js
-│   ├── controllers/
-│   │   ├── commentController.js
-│   ├── models/
-│   │   ├── Comment.js
-│   │   └── Image.js
-│   ├── routes/
-│   │   ├── comments.js
-│   │   └── images.js
-│   ├── utils/
-│   │   └── imageScan.js
-│   ├── server.js
-├── frontend/
-│   ├── assets/
-│   │   ├── css/
-│   │   │   ├── grid.css
-│   │   │   ├── main.css
-│   │   │   └── mobile.css
-│   │   └── js/
-│   │       ├── interact.js
-│   │       ├── main.js
-│   │       ├── masonry.js
-│   │       └── sort.js
-│   └── index.html
-├── uploads/
-├── database/
-├── config.json
-├── .gitignore
-├── package.json
-└── readme.md
-```
+1. **目录权限**
+   - 确保 `uploads` 和 `database` 目录有写入权限
+   - 建议设置目录权限为755
 
-## 注意事项
+2. **上传限制**
+   - 默认图片上传大小限制：5MB
+   - 支持格式：`.jpg`, `.jpeg`, `.png`, `.gif`
 
-1. **目录权限**：确保 `uploads` 和 `database` 目录有写入权限。
-2. **上传限制**：默认图片上传大小限制为5MB。
-3. **支持格式**：支持的图片格式包括 `.jpg`, `.jpeg`, `.png`, `.gif`。
-4. **部署建议**：建议使用PM2等进程管理器部署以确保应用稳定运行。
-5. **移动端测试**：移动端测试需注意内存占用，确保流畅体验。
+3. **部署建议**
+   - 推荐使用PM2进行进程管理
+   - 建议配置反向代理（如Nginx）
+   - 生产环境需要配置SSL证书
 
-## 快速开始
+4. **性能考虑**
+   - 移动端需注意内存占用
+   - 建议使用CDN加速静态资源
+   - 合理配置图片压缩参数
 
-1. **克隆项目**
+## 🤝 贡献指南
 
-   ```bash
-   git clone [项目地址]
-   ```
+我们非常欢迎社区贡献！如果你想参与项目开发，请：
 
-2. **安装依赖**
+1. Fork 项目
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交改动 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 提交Pull Request
 
-   ```bash
-   npm install
-   ```
+## 📄 开源协议
 
-3. **配置项目**
-
-   - 根据需要修改`config.json`配置
-
-4. **创建必要目录**
-
-   ```bash
-   mkdir uploads database
-   ```
-
-5. **启动服务**
-
-   ```bash
-   npm start    # 生产环境
-   npm run dev  # 开发环境 (支持热重载)
-   ```
-
-## 贡献
-
-欢迎提交issues和pull requests来贡献你的想法和改进！
+本项目采用 MIT 协议开源 - 查看 [LICENSE](LICENSE) 了解更多细节
