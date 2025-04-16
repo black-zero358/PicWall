@@ -417,4 +417,4 @@ pic-wall/
 
 ## 📄 开源协议
 
-本项目采用 MIT 协议开源 - 查看 [LICENSE](LICENSE) 了解更多细节
+本项目采用 AGPL-3.0 license 协议开源 - 查看 [LICENSE](LICENSE) 了解更多细节
